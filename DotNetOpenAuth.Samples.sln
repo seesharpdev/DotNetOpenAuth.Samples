@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenID", "OpenID", "{A4059F7E-8E6F-4FA2-A1D5-1B9B46C93F82}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OAuth", "OAuth", "{812D828E-C91A-45AB-BAE9-3FC6D9560F9F}"
@@ -60,32 +60,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MVC", "MVC", "{1CF6B6A5-7FF
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebForms", "WebForms", "{F8180339-526E-4FC7-8325-079441076069}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Classic ASP", "Classic ASP", "{C2D25D8E-4DDA-49C4-8CEE-F48E963E7C18}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MVC", "MVC", "{4F892988-051B-4C28-8886-D142E6BE9A48}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebForms", "WebForms", "{D21679C5-D577-4BD7-90B9-6B67DA8B7E99}"
-EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "localhost", "http://localhost:61979", "{EFA5114E-29D8-4269-A198-FD80E37335F9}"
-	ProjectSection(WebsiteProperties) = preProject
-		UseIISExpress = "true"
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
-		Debug.AspNetCompiler.VirtualPath = "/OpenIdRelyingPartyClassicAsp"
-		Debug.AspNetCompiler.PhysicalPath = "src\OpenID\OpenIdRelyingPartyClassicAsp\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\OpenIdRelyingPartyClassicAsp\"
-		Debug.AspNetCompiler.Updateable = "true"
-		Debug.AspNetCompiler.ForceOverwrite = "true"
-		Debug.AspNetCompiler.FixedNames = "false"
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/OpenIdRelyingPartyClassicAsp"
-		Release.AspNetCompiler.PhysicalPath = "src\OpenID\OpenIdRelyingPartyClassicAsp\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\OpenIdRelyingPartyClassicAsp\"
-		Release.AspNetCompiler.Updateable = "true"
-		Release.AspNetCompiler.ForceOverwrite = "true"
-		Release.AspNetCompiler.FixedNames = "false"
-		Release.AspNetCompiler.Debug = "False"
-		SlnRelativePath = "src\OpenID\OpenIdRelyingPartyClassicAsp\"
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Common", "_Common", "{BD675708-DFDB-4025-9460-D28FA0486B9C}"
 EndProject
@@ -182,12 +159,6 @@ Global
 		{10C2DC8D-B859-416E-ACB0-6DB6ED2385CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10C2DC8D-B859-416E-ACB0-6DB6ED2385CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10C2DC8D-B859-416E-ACB0-6DB6ED2385CC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EFA5114E-29D8-4269-A198-FD80E37335F9}.CodeAnalysis|Any CPU.ActiveCfg = Debug|Any CPU
-		{EFA5114E-29D8-4269-A198-FD80E37335F9}.CodeAnalysis|Any CPU.Build.0 = Debug|Any CPU
-		{EFA5114E-29D8-4269-A198-FD80E37335F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EFA5114E-29D8-4269-A198-FD80E37335F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EFA5114E-29D8-4269-A198-FD80E37335F9}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{EFA5114E-29D8-4269-A198-FD80E37335F9}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{1E8AEA89-BF69-47A1-B290-E8B0FE588700}.CodeAnalysis|Any CPU.ActiveCfg = CodeAnalysis|Any CPU
 		{1E8AEA89-BF69-47A1-B290-E8B0FE588700}.CodeAnalysis|Any CPU.Build.0 = CodeAnalysis|Any CPU
 		{1E8AEA89-BF69-47A1-B290-E8B0FE588700}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -220,12 +191,10 @@ Global
 		{5C65603B-235F-47E6-B536-06385C60DE7F} = {EE10FD11-A42F-404B-9C75-6FC4820DAB82}
 		{4F892988-051B-4C28-8886-D142E6BE9A48} = {41523EF4-413A-4260-9571-B87DA8C2D836}
 		{D21679C5-D577-4BD7-90B9-6B67DA8B7E99} = {41523EF4-413A-4260-9571-B87DA8C2D836}
-		{C2D25D8E-4DDA-49C4-8CEE-F48E963E7C18} = {41523EF4-413A-4260-9571-B87DA8C2D836}
 		{07B193F1-68AD-4E9C-98AF-BEFB5E9403CB} = {4F892988-051B-4C28-8886-D142E6BE9A48}
 		{F289B925-4307-4BEC-B411-885CE70E3379} = {D21679C5-D577-4BD7-90B9-6B67DA8B7E99}
 		{1E8AEA89-BF69-47A1-B290-E8B0FE588700} = {D21679C5-D577-4BD7-90B9-6B67DA8B7E99}
 		{0B4EB2A8-283D-48FB-BCD0-85B8DFFE05E4} = {28BFDF11-06D1-4DE4-8C26-3C9A2AE8FC80}
 		{1229459F-AD2B-471C-897D-A1E7D842C83A} = {28BFDF11-06D1-4DE4-8C26-3C9A2AE8FC80}
-		{EFA5114E-29D8-4269-A198-FD80E37335F9} = {C2D25D8E-4DDA-49C4-8CEE-F48E963E7C18}
 	EndGlobalSection
 EndGlobal
