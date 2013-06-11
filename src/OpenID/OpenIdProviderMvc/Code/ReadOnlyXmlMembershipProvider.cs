@@ -1,279 +1,333 @@
-﻿namespace OpenIdProviderMvc.Code {
-	using System;
-	using System.Collections.Generic;
-	using System.Collections.Specialized;
-	using System.Configuration.Provider;
-	using System.Security.Permissions;
-	using System.Web;
-	using System.Web.Hosting;
-	using System.Web.Security;
-	using System.Xml;
+﻿namespace OpenIdProviderMvc.Code
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.Specialized;
+    using System.Configuration.Provider;
+    using System.Security.Permissions;
+    using System.Web;
+    using System.Web.Hosting;
+    using System.Web.Security;
+    using System.Xml;
 
-	public class ReadOnlyXmlMembershipProvider : MembershipProvider {
-		private Dictionary<string, MembershipUser> users;
-		private string xmlFileName;
+    public class ReadOnlyXmlMembershipProvider : MembershipProvider
+    {
+        private Dictionary<string, MembershipUser> _users;
 
-		// MembershipProvider Properties
-		public override string ApplicationName {
-			get { throw new NotSupportedException(); }
-			set { throw new NotSupportedException(); }
-		}
+        private string _xmlFileName;
 
-		public override bool EnablePasswordRetrieval {
-			get { return false; }
-		}
+        // MembershipProvider Properties
+        public override string ApplicationName
+        {
+            get { throw new NotSupportedException(); }
+            set { throw new NotSupportedException(); }
+        }
 
-		public override bool EnablePasswordReset {
-			get { return false; }
-		}
+        public override bool EnablePasswordRetrieval
+        {
+            get { return false; }
+        }
 
-		public override int MaxInvalidPasswordAttempts {
-			get { throw new NotSupportedException(); }
-		}
+        public override bool EnablePasswordReset
+        {
+            get { return false; }
+        }
 
-		public override int MinRequiredNonAlphanumericCharacters {
-			get { throw new NotSupportedException(); }
-		}
+        public override int MaxInvalidPasswordAttempts
+        {
+            get { throw new NotSupportedException(); }
+        }
 
-		public override int MinRequiredPasswordLength {
-			get { throw new NotSupportedException(); }
-		}
+        public override int MinRequiredNonAlphanumericCharacters
+        {
+            get { throw new NotSupportedException(); }
+        }
 
-		public override int PasswordAttemptWindow {
-			get { throw new NotSupportedException(); }
-		}
+        public override int MinRequiredPasswordLength
+        {
+            get { throw new NotSupportedException(); }
+        }
 
-		public override MembershipPasswordFormat PasswordFormat {
-			get { throw new NotSupportedException(); }
-		}
+        public override int PasswordAttemptWindow
+        {
+            get { throw new NotSupportedException(); }
+        }
 
-		public override string PasswordStrengthRegularExpression {
-			get { throw new NotSupportedException(); }
-		}
+        public override MembershipPasswordFormat PasswordFormat
+        {
+            get { throw new NotSupportedException(); }
+        }
 
-		public override bool RequiresQuestionAndAnswer {
-			get { throw new NotSupportedException(); }
-		}
+        public override string PasswordStrengthRegularExpression
+        {
+            get { throw new NotSupportedException(); }
+        }
 
-		public override bool RequiresUniqueEmail {
-			get { throw new NotSupportedException(); }
-		}
+        public override bool RequiresQuestionAndAnswer
+        {
+            get { throw new NotSupportedException(); }
+        }
 
-		// MembershipProvider Methods
-		public override void Initialize(string name, NameValueCollection config) {
-			// Verify that config isn't null
-			if (config == null) {
-				throw new ArgumentNullException("config");
-			}
+        public override bool RequiresUniqueEmail
+        {
+            get { throw new NotSupportedException(); }
+        }
 
-			// Assign the provider a default name if it doesn't have one
-			if (string.IsNullOrEmpty(name)) {
-				name = "ReadOnlyXmlMembershipProvider";
-			}
+        // MembershipProvider Methods
+        public override void Initialize(string name, NameValueCollection config)
+        {
+            // Verify that config isn't null
+            if (config == null)
+            {
+                throw new ArgumentNullException("config");
+            }
 
-			// Add a default "description" attribute to config if the
-			// attribute doesn't exist or is empty
-			if (string.IsNullOrEmpty(config["description"])) {
-				config.Remove("description");
-				config.Add("description", "Read-only XML membership provider");
-			}
+            // Assign the provider a default name if it doesn't have one
+            if (string.IsNullOrEmpty(name))
+            {
+                name = "ReadOnlyXmlMembershipProvider";
+            }
 
-			// Call the base class's Initialize method
-			base.Initialize(name, config);
+            // Add a default "description" attribute to config if the
+            // attribute doesn't exist or is empty
+            if (string.IsNullOrEmpty(config["description"]))
+            {
+                config.Remove("description");
+                config.Add("description", "Read-only XML membership provider");
+            }
 
-			// Initialize _XmlFileName and make sure the path
-			// is app-relative
-			string path = config["xmlFileName"];
+            // Call the base class's Initialize method
+            base.Initialize(name, config);
 
-			if (string.IsNullOrEmpty(path)) {
-				path = "~/App_Data/Users.xml";
-			}
+            // Initialize _XmlFileName and make sure the path
+            // is app-relative
+            string path = config["xmlFileName"];
 
-			if (!VirtualPathUtility.IsAppRelative(path)) {
-				throw new ArgumentException("xmlFileName must be app-relative");
-			}
+            if (string.IsNullOrEmpty(path))
+            {
+                path = "~/App_Data/Users.xml";
+            }
 
-			string fullyQualifiedPath = VirtualPathUtility.Combine(
-				VirtualPathUtility.AppendTrailingSlash(HttpRuntime.AppDomainAppVirtualPath),
-				path);
+            if (!VirtualPathUtility.IsAppRelative(path))
+            {
+                throw new ArgumentException("xmlFileName must be app-relative");
+            }
 
-			this.xmlFileName = HostingEnvironment.MapPath(fullyQualifiedPath);
-			config.Remove("xmlFileName");
+            string fullyQualifiedPath = VirtualPathUtility.Combine(
+                VirtualPathUtility.AppendTrailingSlash(HttpRuntime.AppDomainAppVirtualPath),
+                path);
 
-			// Make sure we have permission to read the XML data source and
-			// throw an exception if we don't
-			FileIOPermission permission = new FileIOPermission(FileIOPermissionAccess.Read, this.xmlFileName);
-			permission.Demand();
+            _xmlFileName = HostingEnvironment.MapPath(fullyQualifiedPath);
+            config.Remove("xmlFileName");
 
-			// Throw an exception if unrecognized attributes remain
-			if (config.Count > 0) {
-				string attr = config.GetKey(0);
-				if (!string.IsNullOrEmpty(attr)) {
-					throw new ProviderException("Unrecognized attribute: " + attr);
-				}
-			}
-		}
+            // Make sure we have permission to read the XML data source and
+            // throw an exception if we don't
+            var permission = new FileIOPermission(FileIOPermissionAccess.Read, _xmlFileName);
+            permission.Demand();
 
-		public override bool ValidateUser(string username, string password) {
-			// Validate input parameters
-			if (string.IsNullOrEmpty(username) ||
-				string.IsNullOrEmpty(password)) {
-				return false;
-			}
+            // Throw an exception if unrecognized attributes remain
+            if (config.Count > 0)
+            {
+                string attr = config.GetKey(0);
+                if (!string.IsNullOrEmpty(attr))
+                {
+                    throw new ProviderException("Unrecognized attribute: " + attr);
+                }
+            }
+        }
 
-			try {
-				// Make sure the data source has been loaded
-				this.ReadMembershipDataStore();
+        public override bool ValidateUser(string username, string password)
+        {
+            // Validate input parameters
+            if (string.IsNullOrEmpty(username) ||
+                string.IsNullOrEmpty(password))
+            {
+                return false;
+            }
 
-				// Validate the user name and password
-				MembershipUser user;
-				if (this.users.TryGetValue(username, out user)) {
-					if (user.Comment == password) { // Case-sensitive
-						// NOTE: A read/write membership provider
-						// would update the user's LastLoginDate here.
-						// A fully featured provider would also fire
-						// an AuditMembershipAuthenticationSuccess
-						// Web event
-						return true;
-					}
-				}
+            try
+            {
+                // Make sure the data source has been loaded
+                ReadMembershipDataStore();
 
-				// NOTE: A fully featured membership provider would
-				// fire an AuditMembershipAuthenticationFailure
-				// Web event here
-				return false;
-			} catch (Exception) {
-				return false;
-			}
-		}
+                // Validate the user name and password
+                MembershipUser user;
+                if (_users.TryGetValue(username, out user))
+                {
+                    if (user.Comment == password)
+                    { // Case-sensitive
+                        // NOTE: A read/write membership provider
+                        // would update the user's LastLoginDate here.
+                        // A fully featured provider would also fire
+                        // an AuditMembershipAuthenticationSuccess
+                        // Web event
+                        return true;
+                    }
+                }
 
-		public override MembershipUser GetUser(string username, bool userIsOnline) {
-			// Note: This implementation ignores userIsOnline
+                // NOTE: A fully featured membership provider would
+                // fire an AuditMembershipAuthenticationFailure
+                // Web event here
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
 
-			// Validate input parameters
-			if (string.IsNullOrEmpty(username)) {
-				return null;
-			}
+        public override MembershipUser GetUser(string username, bool userIsOnline)
+        {
+            // Note: This implementation ignores userIsOnline
 
-			// Make sure the data source has been loaded
-			this.ReadMembershipDataStore();
+            // Validate input parameters
+            if (string.IsNullOrEmpty(username))
+            {
+                return null;
+            }
 
-			// Retrieve the user from the data source
-			MembershipUser user;
-			if (this.users.TryGetValue(username, out user)) {
-				return user;
-			}
+            // Make sure the data source has been loaded
+            ReadMembershipDataStore();
 
-			return null;
-		}
+            // Retrieve the user from the data source
+            MembershipUser user;
+            if (_users.TryGetValue(username, out user))
+            {
+                return user;
+            }
 
-		public override MembershipUserCollection GetAllUsers(int pageIndex, int pageSize, out int totalRecords) {
-			// Note: This implementation ignores pageIndex and pageSize,
-			// and it doesn't sort the MembershipUser objects returned
+            return null;
+        }
 
-			// Make sure the data source has been loaded
-			this.ReadMembershipDataStore();
+        public override MembershipUserCollection GetAllUsers(int pageIndex, int pageSize, out int totalRecords)
+        {
+            // Note: This implementation ignores pageIndex and pageSize,
+            // and it doesn't sort the MembershipUser objects returned
 
-			MembershipUserCollection users = new MembershipUserCollection();
+            // Make sure the data source has been loaded
+            ReadMembershipDataStore();
 
-			foreach (KeyValuePair<string, MembershipUser> pair in this.users) {
-				users.Add(pair.Value);
-			}
+            var users = new MembershipUserCollection();
 
-			totalRecords = users.Count;
-			return users;
-		}
+            foreach (KeyValuePair<string, MembershipUser> pair in _users)
+            {
+                users.Add(pair.Value);
+            }
 
-		public override int GetNumberOfUsersOnline() {
-			throw new NotSupportedException();
-		}
+            totalRecords = users.Count;
 
-		public override bool ChangePassword(string username, string oldPassword, string newPassword) {
-			throw new NotSupportedException();
-		}
+            return users;
+        }
 
-		public override bool ChangePasswordQuestionAndAnswer(string username, string password, string newPasswordQuestion, string newPasswordAnswer) {
-			throw new NotSupportedException();
-		}
+        public override int GetNumberOfUsersOnline()
+        {
+            throw new NotSupportedException();
+        }
 
-		public override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status) {
-			throw new NotSupportedException();
-		}
+        public override bool ChangePassword(string username, string oldPassword, string newPassword)
+        {
+            throw new NotSupportedException();
+        }
 
-		public override bool DeleteUser(string username, bool deleteAllRelatedData) {
-			throw new NotSupportedException();
-		}
+        public override bool ChangePasswordQuestionAndAnswer(string username, string password, string newPasswordQuestion, string newPasswordAnswer)
+        {
+            throw new NotSupportedException();
+        }
 
-		public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords) {
-			throw new NotSupportedException();
-		}
+        public override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
+        {
+            throw new NotSupportedException();
+        }
 
-		public override MembershipUserCollection FindUsersByName(string usernameToMatch, int pageIndex, int pageSize, out int totalRecords) {
-			throw new NotSupportedException();
-		}
+        public override bool DeleteUser(string username, bool deleteAllRelatedData)
+        {
+            throw new NotSupportedException();
+        }
 
-		public override string GetPassword(string username, string answer) {
-			throw new NotSupportedException();
-		}
+        public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
+        {
+            throw new NotSupportedException();
+        }
 
-		public override MembershipUser GetUser(object providerUserKey, bool userIsOnline) {
-			throw new NotSupportedException();
-		}
+        public override MembershipUserCollection FindUsersByName(string usernameToMatch, int pageIndex, int pageSize, out int totalRecords)
+        {
+            throw new NotSupportedException();
+        }
 
-		public override string GetUserNameByEmail(string email) {
-			throw new NotSupportedException();
-		}
+        public override string GetPassword(string username, string answer)
+        {
+            throw new NotSupportedException();
+        }
 
-		public override string ResetPassword(string username, string answer) {
-			throw new NotSupportedException();
-		}
+        public override MembershipUser GetUser(object providerUserKey, bool userIsOnline)
+        {
+            throw new NotSupportedException();
+        }
 
-		public override bool UnlockUser(string userName) {
-			throw new NotSupportedException();
-		}
+        public override string GetUserNameByEmail(string email)
+        {
+            throw new NotSupportedException();
+        }
 
-		public override void UpdateUser(MembershipUser user) {
-			throw new NotSupportedException();
-		}
+        public override string ResetPassword(string username, string answer)
+        {
+            throw new NotSupportedException();
+        }
 
-		internal string GetSalt(string userName) {
-			// This is just a sample with no database... a real web app MUST return 
-			// a reasonable salt here and have that salt be persistent for each user.
-			this.ReadMembershipDataStore();
-			return this.users[userName].Email;
-		}
+        public override bool UnlockUser(string userName)
+        {
+            throw new NotSupportedException();
+        }
 
-		// Helper method
-		private void ReadMembershipDataStore() {
-			lock (this) {
-				if (this.users == null) {
-					this.users = new Dictionary<string, MembershipUser>(16, StringComparer.InvariantCultureIgnoreCase);
-					XmlDocument doc = new XmlDocument();
-					doc.Load(this.xmlFileName);
-					XmlNodeList nodes = doc.GetElementsByTagName("User");
+        public override void UpdateUser(MembershipUser user)
+        {
+            throw new NotSupportedException();
+        }
 
-					foreach (XmlNode node in nodes) {
-						// Yes, we're misusing some of these fields.  A real app would
-						// have the right fields from a database to use.
-						MembershipUser user = new MembershipUser(
-							Name,                       // Provider name
-							node["UserName"].InnerText, // Username
-							null,                       // providerUserKey
-							node["Salt"].InnerText,     // Email
-							string.Empty,               // passwordQuestion
-							node["Password"].InnerText, // Comment
-							true,                       // isApproved
-							false,                      // isLockedOut
-							DateTime.Now,               // creationDate
-							DateTime.Now,               // lastLoginDate
-							DateTime.Now,               // lastActivityDate
-							DateTime.Now, // lastPasswordChangedDate
-							new DateTime(1980, 1, 1));  // lastLockoutDate
+        internal string GetSalt(string userName)
+        {
+            // This is just a sample with no database... a real web app MUST return 
+            // a reasonable salt here and have that salt be persistent for each user.
+            ReadMembershipDataStore();
 
-						this.users.Add(user.UserName, user);
-					}
-				}
-			}
-		}
-	}
+            return _users[userName].Email;
+        }
+
+        // Helper method
+        private void ReadMembershipDataStore()
+        {
+            lock (this)
+            {
+                if (_users == null)
+                {
+                    _users = new Dictionary<string, MembershipUser>(16, StringComparer.InvariantCultureIgnoreCase);
+                    var doc = new XmlDocument();
+                    doc.Load(_xmlFileName);
+                    XmlNodeList nodes = doc.GetElementsByTagName("User");
+
+                    foreach (XmlNode node in nodes)
+                    {
+                        // Yes, we're misusing some of these fields.  A real app would
+                        // have the right fields from a database to use.
+                        var user = new MembershipUser(
+                            Name,                       // Provider name
+                            node["UserName"].InnerText, // Username
+                            null,                       // providerUserKey
+                            node["Salt"].InnerText,     // Email
+                            string.Empty,               // passwordQuestion
+                            node["Password"].InnerText, // Comment
+                            true,                       // isApproved
+                            false,                      // isLockedOut
+                            DateTime.Now,               // creationDate
+                            DateTime.Now,               // lastLoginDate
+                            DateTime.Now,               // lastActivityDate
+                            DateTime.Now, // lastPasswordChangedDate
+                            new DateTime(1980, 1, 1));  // lastLockoutDate
+
+                        _users.Add(user.UserName, user);
+                    }
+                }
+            }
+        }
+    }
 }
