@@ -1,1 +1,1 @@
-﻿<%@ Application Inherits="OAuthResourceServer.Code.Global" CodeBehind="Code\Global.cs" %>
+﻿<%@ Application Inherits="OAuthResourceServer.Global" CodeBehind="Code\Global.cs" %>

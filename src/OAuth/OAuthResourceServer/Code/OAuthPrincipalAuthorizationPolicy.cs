@@ -1,47 +1,52 @@
-﻿namespace OAuthResourceServer.Code {
-	using System;
-	using System.Collections.Generic;
-	using System.IdentityModel.Claims;
-	using System.IdentityModel.Policy;
-	using System.Linq;
-	using System.Security.Principal;
-	using System.Web;
+﻿namespace OAuthResourceServer
+{
+    using System;
+    using System.IdentityModel.Claims;
+    using System.IdentityModel.Policy;
+    using System.Security.Principal;
 
-	public class OAuthPrincipalAuthorizationPolicy : IAuthorizationPolicy {
-		private readonly Guid uniqueId = Guid.NewGuid();
-		private readonly IPrincipal principal;
+    public class OAuthPrincipalAuthorizationPolicy : IAuthorizationPolicy
+    {
+        private readonly Guid _uniqueId = Guid.NewGuid();
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="OAuthPrincipalAuthorizationPolicy"/> class.
-		/// </summary>
-		/// <param name="principal">The principal.</param>
-		public OAuthPrincipalAuthorizationPolicy(IPrincipal principal) {
-			this.principal = principal;
-		}
+        private readonly IPrincipal _principal;
 
-		#region IAuthorizationComponent Members
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OAuthPrincipalAuthorizationPolicy"/> class.
+        /// </summary>
+        /// <param name="principal">The principal.</param>
+        public OAuthPrincipalAuthorizationPolicy(IPrincipal principal)
+        {
+            _principal = principal;
+        }
 
-		/// <summary>
-		/// Gets a unique ID for this instance.
-		/// </summary>
-		public string Id {
-			get { return this.uniqueId.ToString(); }
-		}
+        #region IAuthorizationComponent Members
 
-		#endregion
+        /// <summary>
+        /// Gets a unique ID for this instance.
+        /// </summary>
+        public string Id
+        {
+            get { return _uniqueId.ToString(); }
+        }
 
-		#region IAuthorizationPolicy Members
+        #endregion
 
-		public ClaimSet Issuer {
-			get { return ClaimSet.System; }
-		}
+        #region IAuthorizationPolicy Members
 
-		public bool Evaluate(EvaluationContext evaluationContext, ref object state) {
-			evaluationContext.AddClaimSet(this, new DefaultClaimSet(Claim.CreateNameClaim(this.principal.Identity.Name)));
-			evaluationContext.Properties["Principal"] = this.principal;
-			return true;
-		}
+        public ClaimSet Issuer
+        {
+            get { return ClaimSet.System; }
+        }
 
-		#endregion
-	}
+        public bool Evaluate(EvaluationContext evaluationContext, ref object state)
+        {
+            evaluationContext.AddClaimSet(this, new DefaultClaimSet(Claim.CreateNameClaim(_principal.Identity.Name)));
+            evaluationContext.Properties["Principal"] = _principal;
+
+            return true;
+        }
+
+        #endregion
+    }
 }

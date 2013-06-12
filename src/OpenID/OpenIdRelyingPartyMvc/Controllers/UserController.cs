@@ -46,7 +46,8 @@
                 {
                     try
                     {
-                        return RelayingParty.CreateRequest(Request.Form["openid_identifier"]).RedirectingResponse.AsActionResult();
+                        return RelayingParty.CreateRequest(Request.Form["openid_identifier"])
+                                            .RedirectingResponse.AsActionResult();
                     }
                     catch (ProtocolException ex)
                     {

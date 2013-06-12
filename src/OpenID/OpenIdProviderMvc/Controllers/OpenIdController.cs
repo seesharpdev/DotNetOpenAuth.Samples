@@ -139,8 +139,8 @@ namespace OpenIdProviderMvc.Controllers
         public ActionResult SendAssertion()
         {
             var pendingRequest = ProviderEndpoint.PendingRequest;
-            var authReq = pendingRequest as IAuthenticationRequest;
-            var anonReq = pendingRequest as IAnonymousRequest;
+            var authenticationRequest = pendingRequest as IAuthenticationRequest;
+            var anonymousRequest = pendingRequest as IAnonymousRequest;
             ProviderEndpoint.PendingRequest = null; // clear session static so we don't do this again
             if (pendingRequest == null)
             {
@@ -148,32 +148,32 @@ namespace OpenIdProviderMvc.Controllers
             }
 
             // Set safe defaults if somehow the user ended up (perhaps through XSRF) here before electing to send data to the RP.
-            if (anonReq != null && !anonReq.IsApproved.HasValue)
+            if (anonymousRequest != null && !anonymousRequest.IsApproved.HasValue)
             {
-                anonReq.IsApproved = false;
+                anonymousRequest.IsApproved = false;
             }
 
-            if (authReq != null && !authReq.IsAuthenticated.HasValue)
+            if (authenticationRequest != null && !authenticationRequest.IsAuthenticated.HasValue)
             {
-                authReq.IsAuthenticated = false;
+                authenticationRequest.IsAuthenticated = false;
             }
 
-            if (authReq != null && authReq.IsAuthenticated.Value)
+            if (authenticationRequest != null && authenticationRequest.IsAuthenticated.Value)
             {
-                if (authReq.IsDirectedIdentity)
+                if (authenticationRequest.IsDirectedIdentity)
                 {
-                    authReq.LocalIdentifier = Models.User.GetClaimedIdentifierForUser(User.Identity.Name);
+                    authenticationRequest.LocalIdentifier = Models.User.GetClaimedIdentifierForUser(User.Identity.Name);
                 }
 
-                if (!authReq.IsDelegatedIdentifier)
+                if (!authenticationRequest.IsDelegatedIdentifier)
                 {
-                    authReq.ClaimedIdentifier = authReq.LocalIdentifier;
+                    authenticationRequest.ClaimedIdentifier = authenticationRequest.LocalIdentifier;
                 }
             }
 
             // Respond to AX/sreg extension requests only on a positive result.
-            if ((authReq != null && authReq.IsAuthenticated.Value) ||
-                (anonReq != null && anonReq.IsApproved.Value))
+            if ((authenticationRequest != null && authenticationRequest.IsAuthenticated.Value) ||
+                (anonymousRequest != null && anonymousRequest.IsApproved.Value))
             {
                 // Look for a Simple Registration request.  When the AXFetchAsSregTransform behavior is turned on
                 // in the web.config file as it is in this sample, AX requests will come in as SReg requests.

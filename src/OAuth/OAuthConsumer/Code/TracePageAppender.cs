@@ -1,13 +1,13 @@
-﻿namespace OAuthConsumer {
-	using System;
-	using System.Collections.Generic;
-	using System.IO;
-	using System.Web;
+﻿namespace OAuthConsumer
+{
+    using System.IO;
 
-	public class TracePageAppender : log4net.Appender.AppenderSkeleton {
-		protected override void Append(log4net.Core.LoggingEvent loggingEvent) {
-			StringWriter sw = new StringWriter(Logging.LogMessages);
-			Layout.Format(sw, loggingEvent);
-		}
-	}
+    public class TracePageAppender : log4net.Appender.AppenderSkeleton
+    {
+        protected override void Append(log4net.Core.LoggingEvent loggingEvent)
+        {
+            var stringWriter = new StringWriter(Logging.LogMessages);
+            Layout.Format(stringWriter, loggingEvent);
+        }
+    }
 }
